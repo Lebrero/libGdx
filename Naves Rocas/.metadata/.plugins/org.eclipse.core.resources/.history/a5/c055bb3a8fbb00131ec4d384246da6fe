@@ -1,0 +1,31 @@
+package com.me.mygdxgame;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+public class AssetsManager {
+	
+	 public TextureRegion fondo;
+	 public Texture nave;
+	 public Texture texture;
+	
+	
+    public void cargarAssets(){
+    	texture = new Texture(Gdx.files.internal("data/espacio512.jpg"));
+		nave = new Texture(Gdx.files.internal("data/nave4.png"));
+		texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		fondo = new TextureRegion(texture, 0, 0, 512, 512);
+    }
+    
+    public void disposeAssets(){
+    	texture.dispose();
+		nave.dispose();
+		
+	
+		
+    }
+
+}

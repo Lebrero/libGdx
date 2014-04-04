@@ -1,0 +1,130 @@
+package com.me.mygdxgame;
+
+import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
+
+public class MyGdxGame implements ApplicationListener {
+	private OrthographicCamera camera;
+	private SpriteBatch batch;
+	private Texture texture;
+	 private ShapeRenderer shrend;
+	    private Rectangle nav;
+	    private boolean debug;
+	    private TextureRegion fondo;
+	    Texture nave;
+		float w,h;
+		
+	
+	
+	
+	@Override
+	public void create() {		
+	
+		w=512;
+		h=512;
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false,w,h);
+		batch = new SpriteBatch();
+		
+		texture = new Texture(Gdx.files.internal("images/espacio512.jpg"));
+		nave = new Texture(Gdx.files.internal("images/nave5.png"));
+		texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		fondo = new TextureRegion(texture, 0, 0, 512, 512);
+		
+		shrend = new ShapeRenderer();
+		
+		nav = new Rectangle();
+		nav.width=64;
+		nav.height=64;
+		nav.x=250;
+		nav.y=0;
+		debug = true;
+	}
+
+	@Override
+	public void dispose() {
+		batch.dispose();
+		texture.dispose();
+		nave.dispose();
+		shrend.dispose();
+	}
+
+	@Override
+	public void render() {		
+		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		batch.setProjectionMatrix(camera.combined);
+		  if (Gdx.input.isKeyPressed(Input.Keys.A)){
+		    	 nav.x = nav.x-2;//vaya hacia la derecjha , el 2 es la velocidad
+		     }
+		     if (Gdx.input.isKeyPressed(Input.Keys.D)){
+		    	 nav.x = nav.x+2;//vaya hacia la izquierda
+		     }
+		     if (Gdx.input.isKeyPressed(Input.Keys.W)){
+		    	 nav.y = nav.y+2;//vaya hacia arriba
+		     }
+		     if (Gdx.input.isKeyPressed(Input.Keys.S)){
+		    	 nav.y = nav.y-2;//vaya ahcia abajo
+		     }
+		     //por raton
+		     if(Gdx.input.isTouched()){
+		    	 nav.x = Gdx.input.getX() - (nav.height/2);
+		    	 nav.y = h - Gdx.input.getY() - (nav.width/2);
+		        }
+		     
+		     if(nav.x < 0){
+		            nav.x = 0;
+		        }
+		     if(nav.x + nav.width > w){
+		    	 nav.x = w - nav.width;
+		        }
+		        //Lo mismo en el eje Y.
+		        if(nav.y < 0){
+		        	nav.y = 0;
+		        }
+		        
+		        if(nav.y + nav.height > h){
+		        	nav.y = h - nav.height;
+		        }
+		        
+		batch.begin();
+		batch.draw(fondo,0,0);
+		 batch.draw(nave,nav.x,nav.y);
+	
+		batch.end();
+		
+		  if(debug){
+	            //Azul
+	        shrend.begin(ShapeType.Line);
+	        shrend.setColor(Color.BLUE);
+	        shrend.rect(nav.x, nav.y, nav.width, nav.height);
+	        shrend.end();
+	     
+	        }
+	}
+
+	@Override
+	public void resize(int width, int height) {
+	}
+
+	@Override
+	public void pause() {
+	}
+
+	@Override
+	public void resume() {
+	}
+}

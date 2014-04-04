@@ -1,0 +1,176 @@
+package com.me.mygdxgame;
+
+import java.util.Iterator;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
+
+public class PlayScreen implements Screen {
+	
+	private OrthographicCamera camera;
+	private SpriteBatch batch;
+	private ShapeRenderer shrend;
+	private Rectangle nav;
+	private boolean debug;
+	private MyGdxGame game;
+	private Array<Rectangle> rocas;
+	private long time;
+	  
+	    public PlayScreen(MyGdxGame game){
+	     
+	        this.game = game;
+	    }
+	    
+
+	@Override
+	public void render(float delta) {
+		
+		   //TEMPORIZADOR
+        if(TimeUtils.millis() - time > 1000){
+            spawnRoca();
+            time = TimeUtils.millis();
+        }
+		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		batch.setProjectionMatrix(camera.combined);
+		  if (Gdx.input.isKeyPressed(Input.Keys.A)){
+		    	 nav.x = nav.x-2;//vaya hacia la derecjha , el 2 es la velocidad
+		     }
+		     if (Gdx.input.isKeyPressed(Input.Keys.D)){
+		    	 nav.x = nav.x+2;//vaya hacia la izquierda
+		     }
+		     if (Gdx.input.isKeyPressed(Input.Keys.W)){
+		    	 nav.y = nav.y+2;//vaya hacia arriba
+		     }
+		     if (Gdx.input.isKeyPressed(Input.Keys.S)){
+		    	 nav.y = nav.y-2;//vaya ahcia abajo
+		     }
+		     //por raton
+		     if(Gdx.input.isTouched()){
+		    	 nav.x = Gdx.input.getX() - (nav.height/2);
+		    	 nav.y = game.h - Gdx.input.getY() - (nav.width/2);
+		        }
+		     
+		     if(nav.x < 0){
+		            nav.x = 0;
+		        }
+		     if(nav.x + nav.width > game.w){
+		    	 nav.x = game.w - nav.width;
+		        }
+		        //Lo mismo en el eje Y.
+		        if(nav.y < 0){
+		        	nav.y = 0;
+		        }
+		        
+		        if(nav.y + nav.height > game.h){
+		        	nav.y = game.h - nav.height;
+		        }
+		        
+		batch.begin();
+		batch.draw(game.assets.fondo,0,0);
+		 batch.draw(game.assets.nave,nav.x,nav.y);
+		 
+	        //Iteracion 
+	        Iterator<Rectangle> iter = rocas.iterator();
+	        while(iter.hasNext()){
+	            Rectangle rec = iter.next();
+	            batch.draw(game.assets.roca,rec.x,rec.y,rec.height,rec.width);   
+	            rec.y--;
+	            if(rec.overlaps(nav)){     
+                    iter.remove();     
+                   
+            }
+	        }
+	        
+		batch.end();
+		
+		  if(debug){
+	            //Azul
+	        shrend.begin(ShapeType.Line);
+	        shrend.setColor(Color.BLUE);
+	        shrend.rect(nav.x, nav.y, nav.width, nav.height);
+	        shrend.end();
+		  }
+		
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void show() {
+		shrend = new ShapeRenderer();
+		nav = new Rectangle();
+		nav.width=64;
+		nav.height=64;
+		nav.x=0;
+		nav.y=0;
+		debug = true;
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false,game.w,game.h);
+		batch = new SpriteBatch();
+		
+		   rocas = new Array<Rectangle>();
+		
+	
+		
+		
+		
+	}
+	
+	 public void spawnRoca(){
+	        Rectangle rec = new Rectangle();
+	        rec.height = 64;
+	        rec.width = 64;
+	        float randomX = MathUtils.random(0 ,(game.w - rec.width));
+	        rec.x = nav.x;
+	        rec.y = nav.y;
+	        rocas.add(rec);
+	        } 
+
+@Override
+	public void dispose() {
+batch.dispose();
+		
+		shrend.dispose();
+		
+		
+	}
+
+
+@Override
+public void hide() {
+	// TODO Auto-generated method stub
+	
+}
+
+
+@Override
+public void pause() {
+	// TODO Auto-generated method stub
+	
+}
+
+
+@Override
+public void resume() {
+	// TODO Auto-generated method stub
+	
+}
+
+}
